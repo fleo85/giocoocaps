@@ -9,7 +9,6 @@ import java.util.Scanner;
 
 import _gestioneeventi.Environment;
 import _gestioneeventi.EsecuzioneEnvironment;
-import _gestioneeventi.Stop;
 import attivita_composte.AttivitaPrincipale;
 import casella.Casella;
 import casellaSalto.CasellaSalto;
