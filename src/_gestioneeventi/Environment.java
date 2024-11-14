@@ -4,19 +4,68 @@ import java.io.PrintWriter;
 import java.util.*;
 import java.util.concurrent.*;
 
-import eventi.Fine;
-import eventi.NuovaPosizione;
-import giocatore.Giocatore;
-import partita.Partita;
-
 public final class Environment { // NB con final non si possono definire
 	// sottoclassi
 	private Environment() { // NB non si possono costruire oggetti Environment
-	}
+	} 
 
 	private static ConcurrentHashMap<Listener, LinkedBlockingQueue<Evento>> codeEventiDeiListener = new ConcurrentHashMap<Listener, LinkedBlockingQueue<Evento>>();
-	public static HashMap<Giocatore, PrintWriter> notifyStream = new HashMap<Giocatore, PrintWriter>();
+	
+	public static interface SerializableEvent {
+		public String toSerializableString();
+	}
+	
+	private static class LoggableEvent {
+		private Listener destination;
+		private Listener source;
+		private Class<? extends SerializableEvent> eventClass;
+		public LoggableEvent(Listener destination, Listener source, Class<? extends SerializableEvent> eventClass) {
+			this.destination = destination;
+			this.eventClass = eventClass;
+			this.source = source;
+		}
+		public Listener getDestination() {
+			return this.destination;
+		}
+		public Class<? extends SerializableEvent> getEventClass() {
+			return this.eventClass;
+		}
+		public Listener getSource() {
+			return this.source;
+		}
+		@Override
+		public boolean equals(Object o) {
+			if (o != null && getClass().equals(o.getClass())) {
+				LoggableEvent b = (LoggableEvent) o;
+				return (this.destination == null || b.destination == this.destination) &&
+						(this.source == null || b.source == this.source) &&
+						b.eventClass.equals(this.eventClass);
+			} else
+				return false;
+		}
+		@Override
+		public int hashCode() {
+			return this.eventClass.hashCode();
+		}
+	}
+	
+	private static HashMap<LoggableEvent, HashSet<PrintWriter>> remoteLogging = new HashMap<LoggableEvent, HashSet<PrintWriter>>();
 
+	public static void addRemoteEventLogger(Listener destination, Listener source, Class<? extends SerializableEvent> eventClass, PrintWriter pw) {
+		LoggableEvent le = new Environment.LoggableEvent(destination, source, eventClass);
+		if (!remoteLogging.containsKey(le)) {
+			remoteLogging.put(le, new HashSet<PrintWriter>());
+		}
+		remoteLogging.get(le).add(pw);
+	}
+	
+	public static void removeRemoteEventLogger(Listener destination, Listener source, Class<? extends SerializableEvent> eventClass, PrintWriter pw) {
+		LoggableEvent le = new Environment.LoggableEvent(destination, source, eventClass);
+		if (remoteLogging.containsKey(le)) {
+			remoteLogging.get(le).remove(pw);
+		}
+	}
+	
 	public static void addListener(Listener lr, EsecuzioneEnvironment e) {
 		if (e == null)
 			return;
@@ -35,17 +84,19 @@ public final class Environment { // NB con final non si possono definire
 		Listener destinatario = e.getDestinatario();
 		
 		// MODIFICA AD ENVIRONMENT PER SUPPORTARE TRASMISSIONE EVENTI
-		if (e.getMittente() != null && e.getMittente().getClass().equals(Giocatore.class)) {
-			Giocatore g = (Giocatore) e.getMittente();
-			if (notifyStream.containsKey(g)) {
-				PrintWriter pw = notifyStream.get(g);
-				if (e.getClass().equals(NuovaPosizione.class)) {
-					NuovaPosizione eCast = (NuovaPosizione) e;
-					pw.println(g.getNome() + " IN " + eCast.getNuovaPosizione().getDisegno());
-					pw.flush();
-				} else if (e.getClass().equals(Fine.class)) {
-					pw.println(g.getNome() + " FINE");
-					pw.flush();
+		if (e instanceof SerializableEvent) {
+			SerializableEvent castedE = (SerializableEvent) e;
+			LoggableEvent le = new Environment.LoggableEvent(e.getDestinatario(), e.getMittente(), castedE.getClass());
+			if (remoteLogging.containsKey(le)) {
+				for (PrintWriter pw: remoteLogging.get(le)) {
+					String toSend = castedE.toSerializableString();
+					if (toSend != null) {
+						//La println su un printwriter chiuso non da errore, non c'è bisogno di try/catch
+						pw.println(toSend);
+						pw.flush();
+					} else {
+						System.out.println("WARNING: MESSAGGIO NULL NON INVIATO");
+					}
 				}
 			}
 		}

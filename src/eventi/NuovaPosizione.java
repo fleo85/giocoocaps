@@ -2,9 +2,11 @@ package eventi;
 
 import _gestioneeventi.Evento;
 import _gestioneeventi.Listener;
+import _gestioneeventi.Environment;
 import casella.Casella;
+import giocatore.Giocatore;
 
-public class NuovaPosizione extends Evento {
+public class NuovaPosizione extends Evento implements Environment.SerializableEvent {
 	private Casella nuovaPosizione;
 	public NuovaPosizione(Listener m, Listener d, Casella nuovaPosizione) {
 		super(m, d);
@@ -28,5 +30,10 @@ public class NuovaPosizione extends Evento {
 	public String toString() {
 		return "Nuova Posizione(" + getMittente() + " -> " + getDestinatario()
 				+ ": " + nuovaPosizione + " )";
+	}
+	@Override
+	public String toSerializableString() {
+		Giocatore g = (Giocatore) this.getMittente();
+		return g.getNome() + " IN " + this.getNuovaPosizione().getDisegno();
 	}
 }

@@ -27,6 +27,7 @@ public final class EsecuzioneEnvironment { // NB con final non si possono
 
 	private static ConcurrentHashMap<Listener, Thread> listenerAttivi = null;
 
+	//TODO: Verificare aggiunta listener in corsa
 	public static synchronized void addListener(Listener lr) {
 		Environment.addListener(lr, new EsecuzioneEnvironment());
 		if (statocorrente == Stato.Esecuzione) {
@@ -55,6 +56,7 @@ public final class EsecuzioneEnvironment { // NB con final non si possono
 		}
 	}
 	
+	//TODO: Verificare disattiva listener in corsa
 	public static synchronized void disattivaListener(Listener l) {
 		Environment.aggiungiEvento(new Stop(null, l));
 		Thread thread = listenerAttivi.get(l);

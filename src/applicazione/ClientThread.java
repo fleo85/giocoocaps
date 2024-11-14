@@ -5,13 +5,14 @@ import java.net.*;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
-import java.util.Scanner;
 
 import _gestioneeventi.Environment;
 import _gestioneeventi.EsecuzioneEnvironment;
 import attivita_composte.AttivitaPrincipale;
 import casella.Casella;
 import casellaSalto.CasellaSalto;
+import eventi.Fine;
+import eventi.NuovaPosizione;
 import giocatore.Giocatore;
 
 public class ClientThread implements Runnable {
@@ -20,14 +21,12 @@ public class ClientThread implements Runnable {
 	private boolean fired = false;
 	private SenderThread st = null;
 	private boolean running = false;
-	private int temperatura;
 	Server parent;
 	
 	LinkedList<Casella> tabellone = new LinkedList<Casella>();
 
 	public ClientThread(Socket s, Server parent) {
 		sock = s;
-		this.temperatura = 0;
 		this.parent = parent;
 	}
 	
@@ -77,19 +76,19 @@ public class ClientThread implements Runnable {
 		this.setInitialState();
 		fired = true;
 		running = true;
-		Scanner in = null;
+		BufferedReader in = null;
 		PrintWriter pw = null;
 		try {
-			in = new Scanner(sock.getInputStream());
+			in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 			pw = new PrintWriter(sock.getOutputStream());
 		} catch (IOException e) {
 			parent.removeFromCTList(this);
 			e.printStackTrace();
 		}
+		HashSet<Giocatore> giocatoriConnessione = new HashSet<Giocatore>();
 		try {
-			HashSet<Giocatore> giocatoriConnessione = new HashSet<Giocatore>();
 			while (running) {
-				String cmd = in.nextLine();
+				String cmd = in.readLine();
 				System.out.println("Ricevuto: " + cmd);
 				if (cmd.startsWith("START")) {
 					HashSet<Giocatore> giocatori = new HashSet<Giocatore>();
@@ -117,7 +116,8 @@ public class ClientThread implements Runnable {
 						e.printStackTrace();
 					}
 					for (Giocatore g: giocatori) {
-						Environment.notifyStream.put(g, pw);
+						Environment.addRemoteEventLogger(null, g, Fine.class, pw);
+						Environment.addRemoteEventLogger(null, g, NuovaPosizione.class, pw);
 					}
 					Thread attivitaPrincipale = new Thread(new AttivitaPrincipale(tabellone, giocatori));
 					attivitaPrincipale.start();
@@ -125,7 +125,8 @@ public class ClientThread implements Runnable {
 					pw.println("END");
 					pw.flush();
 					for (Giocatore g: giocatoriConnessione) {
-						Environment.notifyStream.remove(g);
+						Environment.removeRemoteEventLogger(null, g, Fine.class, pw);
+						Environment.removeRemoteEventLogger(null, g, NuovaPosizione.class, pw);
 						EsecuzioneEnvironment.disattivaListener(g);
 					}
 				} else {
@@ -133,20 +134,26 @@ public class ClientThread implements Runnable {
 					running = false;
 				}
 			}
-			for (Giocatore g: giocatoriConnessione) {
-				Environment.notifyStream.remove(g);
-				EsecuzioneEnvironment.disattivaListener(g);
-			}
-			sock.close();
-			pw.close();
-			in.close();
-			
 		} catch (IOException e1) {
 			e1.printStackTrace();
 			parent.removeFromCTList(this);
 		} catch (NoSuchElementException e2) {
 			e2.printStackTrace();
 			parent.removeFromCTList(this);
+		} finally {
+			try {
+				sock.close();
+				pw.close();
+				in.close();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+			for (Giocatore g: giocatoriConnessione) {
+				Environment.removeRemoteEventLogger(null, g, Fine.class, pw);
+				Environment.removeRemoteEventLogger(null, g, NuovaPosizione.class, pw);
+				EsecuzioneEnvironment.disattivaListener(g);
+			}
+			System.out.println("RIMUOVO TUTTI I GIOCATORI");
 		}
 	}
 

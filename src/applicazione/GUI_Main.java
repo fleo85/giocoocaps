@@ -5,7 +5,6 @@ import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.util.HashSet;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -14,10 +13,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-
-import attivita_composte.AttivitaPrincipale;
-import casella.Casella;
-import casellaSalto.CasellaSalto;
 
 public class GUI_Main extends JFrame implements ActionListener{
 	/**

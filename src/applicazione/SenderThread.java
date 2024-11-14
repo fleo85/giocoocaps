@@ -1,12 +1,9 @@
 package applicazione;
 
 import java.io.PrintWriter;
-import java.util.HashSet;
 import java.util.List;
 
 import casella.Casella;
-import casellaSalto.CasellaSalto;
-import giocatore.Giocatore;
 
 public class SenderThread implements Runnable {
 
