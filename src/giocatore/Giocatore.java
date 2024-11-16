@@ -1,6 +1,7 @@
 package giocatore;
 
 import comprendere.*;
+import partita.Partita;
 import casella.*;
 import _framework.*;
 import _gestioneeventi.*;
@@ -75,6 +76,7 @@ public class Giocatore implements Listener {
 	}
 
 	Stato statocorrente = Stato.ALLENAMENTO;
+	Partita partitaCorrente = null;
 
 	public Stato getStato() {
 		return statocorrente;

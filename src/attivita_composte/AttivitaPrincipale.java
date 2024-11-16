@@ -13,19 +13,18 @@ import _framework.*;
 public class AttivitaPrincipale implements Runnable {
 
 	private boolean eseguita = false;
+	private Partita partita;
 	private List<Casella> tabellone;
-	private HashSet<Giocatore> giocatori;
 
-	public AttivitaPrincipale(List<Casella> tabellone, HashSet<Giocatore> giocatori) {
+	public AttivitaPrincipale(List<Casella> tabellone, Partita p) {
 		this.tabellone = tabellone;
-		this.giocatori = giocatori;
+		this.partita = p;
 	}
 
 	public synchronized void run() {
 		if (eseguita == true)
 			return;
 		eseguita = true;
-		Partita partita;
 		Boolean valido = false;
 
 		Verifica vs = new Verifica(this.tabellone);
@@ -35,17 +34,13 @@ public class AttivitaPrincipale implements Runnable {
 		if (!valido)
 			return;
 		else {
-			CreaPartita cp = new CreaPartita(tabellone, giocatori);
-			Executor.perform(cp);
-			partita = cp.getResult();
-
 			StampaPartita.perform(tabellone, partita);
 
 			AttivitaSottoramo1 a1 = new AttivitaSottoramo1(partita);
 			Thread ramo1 = new Thread(a1);
 			ramo1.start();
 
-			AttivitaSottoramo2 a2 = new AttivitaSottoramo2();
+			AttivitaSottoramo2 a2 = new AttivitaSottoramo2(partita);
 			Thread ramo2 = new Thread(a2);
 			ramo2.start();
 
@@ -55,6 +50,7 @@ public class AttivitaPrincipale implements Runnable {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+			System.out.println("PARTITA FINITA IN QUALCHE MANIERA");
 		}
 
 	}

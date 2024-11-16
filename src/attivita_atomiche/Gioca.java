@@ -31,8 +31,9 @@ public class Gioca implements Task {
 		while (it.hasNext()) {
 			Giocatore g = it.next().getGiocatore();
 			EsecuzioneEnvironment.addListener(g);
-			Environment.aggiungiEvento(new Inizio(null, g));
+			Environment.aggiungiEvento(new Inizio(null, g, this.partita));
 		}
+		EsecuzioneEnvironment.addListener(partita);
 
 		Random generator = new Random((long) 1);
 

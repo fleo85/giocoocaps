@@ -21,7 +21,7 @@ class GiocatoreFired implements Task {
 	}
 
 	// usati per simulare il lancio del dado
-	private Random generator = new Random((long) 195689.987);
+	private Random generator = new Random();
 
 	private int randomNumber() {
 		return this.generator.nextInt(6) + 1;
@@ -35,6 +35,8 @@ class GiocatoreFired implements Task {
 		switch (g.getStato()) {
 		case ALLENAMENTO:
 			if (e.getClass() == Inizio.class) {
+				Inizio i = (Inizio) e;
+				g.partitaCorrente = i.getPartita();
 				g.statocorrente = Stato.INPARTITA;
 			}
 			break;
@@ -51,7 +53,7 @@ class GiocatoreFired implements Task {
 					next = g.getLinkOccupare().getLinkSuccessore();
 
 					if (next == null) {
-						Environment.aggiungiEvento(new Fine(g, null));
+						Environment.aggiungiEvento(new FinePartita(g, g.partitaCorrente, g));
 						fine = true;
 					} else {
 						g.inserisciLinkOccupare(next);
@@ -77,7 +79,7 @@ class GiocatoreFired implements Task {
 					}
 					Environment.aggiungiEvento(new NuovaPosizione(g, null, next));
 					if (next.getLinkSuccessore() == null) {
-						Environment.aggiungiEvento(new Fine(g, null));
+						Environment.aggiungiEvento(new FinePartita(g, g.partitaCorrente, g));
 						fine = true;
 					}
 				}
@@ -95,8 +97,9 @@ class GiocatoreFired implements Task {
 							.randomNumber()));
 				} else
 					System.out.println("... ha vinto !!");
-			} else if (e.getClass() == Fine.class)
+			} else if (e.getClass() == Fine.class) {
 				g.statocorrente = Stato.ALLENAMENTO;
+			}
 			break;
 		default:
 			throw new RuntimeException("Stato corrente non riconosciuto.");

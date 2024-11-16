@@ -4,6 +4,8 @@ import java.io.PrintWriter;
 import java.util.*;
 import java.util.concurrent.*;
 
+import eventi.FinePartita;
+
 public final class Environment { // NB con final non si possono definire
 	// sottoclassi
 	private Environment() { // NB non si possono costruire oggetti Environment
@@ -37,8 +39,8 @@ public final class Environment { // NB con final non si possono definire
 		public boolean equals(Object o) {
 			if (o != null && getClass().equals(o.getClass())) {
 				LoggableEvent b = (LoggableEvent) o;
-				return (this.destination == null || b.destination == this.destination) &&
-						(this.source == null || b.source == this.source) &&
+				return (this.destination == null || b.destination == null || b.destination == this.destination) &&
+						(this.source == null || b.source == null || b.source == this.source) &&
 						b.eventClass.equals(this.eventClass);
 			} else
 				return false;

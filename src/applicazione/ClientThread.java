@@ -2,18 +2,22 @@ package applicazione;
 
 import java.io.*;
 import java.net.*;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
+import _framework.Executor;
 import _gestioneeventi.Environment;
 import _gestioneeventi.EsecuzioneEnvironment;
+import attivita_atomiche.CreaPartita;
 import attivita_composte.AttivitaPrincipale;
 import casella.Casella;
 import casellaSalto.CasellaSalto;
-import eventi.Fine;
+import eventi.FinePartita;
 import eventi.NuovaPosizione;
 import giocatore.Giocatore;
+import partita.Partita;
 
 public class ClientThread implements Runnable {
 
@@ -86,6 +90,8 @@ public class ClientThread implements Runnable {
 			e.printStackTrace();
 		}
 		HashSet<Giocatore> giocatoriConnessione = new HashSet<Giocatore>();
+		Thread attivitaPrincipale = null;
+		Partita partita = null;
 		try {
 			while (running) {
 				String cmd = in.readLine();
@@ -106,6 +112,9 @@ public class ClientThread implements Runnable {
 							giocatoriConnessione.add(g);
 						}
 					}
+					CreaPartita cp = new CreaPartita(tabellone, giocatori);
+					Executor.perform(cp);
+					partita = cp.getResult();
 					st = new SenderThread(pw, tabellone);
 					Thread t = new Thread(st);
 					t.start();
@@ -116,19 +125,28 @@ public class ClientThread implements Runnable {
 						e.printStackTrace();
 					}
 					for (Giocatore g: giocatori) {
-						Environment.addRemoteEventLogger(null, g, Fine.class, pw);
 						Environment.addRemoteEventLogger(null, g, NuovaPosizione.class, pw);
 					}
-					Thread attivitaPrincipale = new Thread(new AttivitaPrincipale(tabellone, giocatori));
+					Environment.addRemoteEventLogger(partita, null, FinePartita.class, pw);
+					attivitaPrincipale = new Thread(new AttivitaPrincipale(tabellone, partita));
 					attivitaPrincipale.start();
 				} else if (cmd.equals("INTERRUPT")) {
-					pw.println("END");
-					pw.flush();
+					Environment.aggiungiEvento(new FinePartita(null, partita, null));
+					if (attivitaPrincipale != null) {
+						try {
+							attivitaPrincipale.join();
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
 					for (Giocatore g: giocatoriConnessione) {
-						Environment.removeRemoteEventLogger(null, g, Fine.class, pw);
 						Environment.removeRemoteEventLogger(null, g, NuovaPosizione.class, pw);
 						EsecuzioneEnvironment.disattivaListener(g);
 					}
+					Environment.removeRemoteEventLogger(partita, null, FinePartita.class, pw);
+					EsecuzioneEnvironment.disattivaListener(partita);
+					pw.println("END");
+					pw.flush();
 				} else {
 					parent.removeFromCTList(this);
 					running = false;
@@ -149,10 +167,10 @@ public class ClientThread implements Runnable {
 				ex.printStackTrace();
 			}
 			for (Giocatore g: giocatoriConnessione) {
-				Environment.removeRemoteEventLogger(null, g, Fine.class, pw);
 				Environment.removeRemoteEventLogger(null, g, NuovaPosizione.class, pw);
 				EsecuzioneEnvironment.disattivaListener(g);
 			}
+			Environment.removeRemoteEventLogger(null, partita, FinePartita.class, pw);
 			System.out.println("RIMUOVO TUTTI I GIOCATORI");
 		}
 	}

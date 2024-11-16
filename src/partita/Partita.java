@@ -1,9 +1,14 @@
 package partita;
 
 import java.util.*;
-import comprendere.*;
 
-public class Partita {
+import _framework.Executor;
+import _gestioneeventi.Evento;
+import _gestioneeventi.Listener;
+import comprendere.*;
+import giocatore.Giocatore.Stato;
+
+public class Partita implements Listener {
 	private final String nome;
 	private ArrayList<TipoLinkComprendere> insiemeLink;
 	public final int MINCOMPRENDERE = 2;
@@ -46,6 +51,21 @@ public class Partita {
 
 	public int quantiGiocatori() {
 		return insiemeLink.size();
+	}
+	
+	public static enum Stato {
+		INIZIATA, FINITA
+	}
+
+	Stato statocorrente = Stato.INIZIATA;
+
+	public Stato getStato() {
+		return statocorrente;
+	}
+
+	@Override
+	public void fired(Evento e) {
+		Executor.perform(new PartitaFired(this, e));
 	}
 
 }
