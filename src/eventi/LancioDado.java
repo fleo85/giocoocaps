@@ -3,31 +3,24 @@ package eventi;
 import _gestioneeventi.*;
 
 public class LancioDado extends Evento {
-	private int numerocaselle;
 
-	public LancioDado(Listener m, Listener d, int valore) {
+	public LancioDado(Listener m, Listener d) {
 		super(m, d);
-		numerocaselle = valore;
 	}
 
 	public boolean equals(Object o) {
 		if (super.equals(o)) {
 			LancioDado p = (LancioDado) o;
-			return this.numerocaselle == p.numerocaselle;
+			return true;
 		}
 		return false;
 	}
 
 	public int hashCode() {
-		return super.hashCode() + getClass().hashCode() + numerocaselle;
+		return super.hashCode() + getClass().hashCode();
 	}
 
 	public String toString() {
-		return "Lancio del Dado(" + getMittente() + " -> " + getDestinatario()
-				+ ": " + numerocaselle + " )";
-	}
-
-	public int getLancio() {
-		return numerocaselle;
+		return "Lancio del Dado(" + getMittente() + " -> " + getDestinatario() + " )";
 	}
 }

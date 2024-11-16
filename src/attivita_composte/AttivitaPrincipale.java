@@ -1,7 +1,5 @@
 package attivita_composte;
 
-import giocatore.Giocatore;
-
 import java.util.*;
 
 import casella.*;

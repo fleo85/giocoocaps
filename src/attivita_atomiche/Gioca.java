@@ -35,11 +35,8 @@ public class Gioca implements Task {
 		}
 		EsecuzioneEnvironment.addListener(partita);
 
-		Random generator = new Random((long) 1);
-
 		Environment.aggiungiEvento(new LancioDado(null, partita
-				.getLinkComprendere().get(0).getGiocatore(), generator
-				.nextInt(6) + 1));
+				.getLinkComprendere().get(0).getGiocatore()));
 		EsecuzioneEnvironment.attivaListener();
 	}
 

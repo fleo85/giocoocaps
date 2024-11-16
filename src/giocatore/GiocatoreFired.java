@@ -7,6 +7,7 @@ import casella.*;
 import casellaSalto.*;
 import _framework.*;
 import _gestioneeventi.*;
+import attivita_composte.AttivitaMovimento;
 import eventi.*;
 import giocatore.Giocatore.Stato;
 
@@ -42,62 +43,17 @@ class GiocatoreFired implements Task {
 			break;
 		case INPARTITA:
 			if (e.getClass() == LancioDado.class) {
-				LancioDado d = (LancioDado) e;
+				int lancio = this.randomNumber();
 
-				System.out.print(g.getNome() + " ha lanciato " + d.getLancio()
+				System.out.print(g.getNome() + " ha lanciato " + lancio
 						+ " e si sta muovendo ...");
 
-				Casella next = null;
-				Boolean fine = false;
-				for (int i = 1; i <= d.getLancio() && !fine; i++) {
-					next = g.getLinkOccupare().getLinkSuccessore();
-
-					if (next == null) {
-						Environment.aggiungiEvento(new FinePartita(g, g.partitaCorrente, g));
-						fine = true;
-					} else {
-						g.inserisciLinkOccupare(next);
-						try {
-							Thread.sleep(1000);
-						} catch (InterruptedException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-						Environment.aggiungiEvento(new NuovaPosizione(g, null, next));
-						System.out.print(".." + next.getDisegno());
-					}
-				}
-				while (!fine && next.getClass() == CasellaSalto.class) {
-					next = ((CasellaSalto) g.getLinkOccupare())
-							.getLinkSaltare();
-					g.inserisciLinkOccupare(next);
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-					Environment.aggiungiEvento(new NuovaPosizione(g, null, next));
-					if (next.getLinkSuccessore() == null) {
-						Environment.aggiungiEvento(new FinePartita(g, g.partitaCorrente, g));
-						fine = true;
-					}
-				}
-
-				if (!fine) {
-					System.out.println("... si trova ora nella casella "
-							+ next.getDisegno());
-					Partita p = g.getLinkComprendere().getPartita();
-					List<TipoLinkComprendere> links = p.getLinkComprendere();
-					int i1 = links.indexOf(new TipoLinkComprendere(g, p));
-					Giocatore prossimo = links.get(
-							(i1 + 1) % p.getLinkComprendere().size())
-							.getGiocatore();
-					Environment.aggiungiEvento(new LancioDado(g, prossimo, this
-							.randomNumber()));
-				} else
-					System.out.println("... ha vinto !!");
+				g.attivitaMovimento = new Thread(new AttivitaMovimento(g, lancio));
+				g.attivitaMovimento.start();
 			} else if (e.getClass() == Fine.class) {
+				if (g.attivitaMovimento != null && g.attivitaMovimento.isAlive()) {
+					g.attivitaMovimento.interrupt();
+				}
 				g.statocorrente = Stato.ALLENAMENTO;
 			}
 			break;
