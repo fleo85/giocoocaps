@@ -16,9 +16,9 @@ public class Verifica implements Task {
 		this.tabellone = tabellone;
 	}
 
-	public synchronized void esegui(Executor e) {
+	public synchronized void esegui() {
 
-		if (e == null || eseguita == true)
+		if (eseguita == true)
 			return;
 		eseguita = true;
 

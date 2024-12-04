@@ -20,9 +20,9 @@ public class CreaPartita implements Task {
 		this.giocatori = giocatori;
 	}
 
-	public synchronized void esegui(Executor e) {
+	public synchronized void esegui() {
 
-		if (e == null || eseguita == true)
+		if (eseguita == true)
 			return;
 		eseguita = true;
 

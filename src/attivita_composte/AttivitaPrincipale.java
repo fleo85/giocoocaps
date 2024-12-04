@@ -26,7 +26,7 @@ public class AttivitaPrincipale implements Runnable {
 		Boolean valido = false;
 
 		Verifica vs = new Verifica(this.tabellone);
-		Executor.perform(vs);
+		TaskExecutor.getInstance().perform(vs);
 		valido = vs.getResult();
 
 		if (!valido)

@@ -84,7 +84,7 @@ public class Giocatore implements Listener {
 	}
 
 	public void fired(Evento e) {
-		Executor.perform(new GiocatoreFired(this, e));
+		TaskExecutor.getInstance().perform(new GiocatoreFired(this, e));
 	}
 
 	public String toString() {

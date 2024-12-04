@@ -2,7 +2,7 @@ package partita;
 
 import java.util.*;
 
-import _framework.Executor;
+import _framework.TaskExecutor;
 import _gestioneeventi.Evento;
 import _gestioneeventi.Listener;
 import comprendere.*;
@@ -65,7 +65,7 @@ public class Partita implements Listener {
 
 	@Override
 	public void fired(Evento e) {
-		Executor.perform(new PartitaFired(this, e));
+		TaskExecutor.getInstance().perform(new PartitaFired(this, e));
 	}
 
 }

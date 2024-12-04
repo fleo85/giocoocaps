@@ -28,9 +28,8 @@ class GiocatoreFired implements Task {
 		return this.generator.nextInt(6) + 1;
 	}
 
-	public synchronized void esegui(Executor exec) {
-		if (eseguita || exec == null
-				|| (e.getDestinatario() != g && e.getDestinatario() != null))
+	public synchronized void esegui() {
+		if (eseguita || (e.getDestinatario() != g && e.getDestinatario() != null))
 			return;
 		eseguita = true;
 		switch (g.getStato()) {

@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
-import _framework.Executor;
+import _framework.TaskExecutor;
 import _gestioneeventi.Environment;
 import _gestioneeventi.EsecuzioneEnvironment;
 import attivita_atomiche.CreaPartita;
@@ -113,7 +113,7 @@ public class ClientThread implements Runnable {
 						}
 					}
 					CreaPartita cp = new CreaPartita(tabellone, giocatori);
-					Executor.perform(cp);
+					TaskExecutor.getInstance().perform(cp);
 					partita = cp.getResult();
 					st = new SenderThread(pw, tabellone);
 					Thread t = new Thread(st);

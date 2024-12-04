@@ -5,9 +5,8 @@ public class Evento {
 	private Listener destinatario;
 
 	public Evento(Listener m, Listener d) {
-		mittente = m; // se null, il mittente non e' rilevante (eg, l'evento e'
-		// esogeno)
-		destinatario = d; // se null, il messaggio e' in broadcasting
+		this.mittente = m;
+		this.destinatario = d;
 	}
 
 	public Listener getMittente() {
@@ -18,15 +17,24 @@ public class Evento {
 		return destinatario;
 	}
 
+	@Override
 	public boolean equals(Object o) {
-		if (o != null && getClass().equals(o.getClass())) {
-			Evento e = (Evento) o;
-			return mittente == e.mittente && destinatario == e.destinatario;
-		} else
+		if (o == null)
 			return false;
+		if (! getClass().equals(o.getClass()))
+			return false;
+		Evento e = (Evento) o;
+		return this.mittente == e.mittente && this.destinatario == e.destinatario;
+	}
+ 
+	@Override
+	public int hashCode() {
+		return this.mittente.hashCode() + this.destinatario.hashCode();  
 	}
 
-	public int hashCode() {
-		return mittente.hashCode() + destinatario.hashCode();
+	@Override
+	public String toString() {
+		return "(Evento " + this.mittente + " -> " + this.destinatario + ")";
 	}
 }
+

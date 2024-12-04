@@ -2,6 +2,10 @@ package _gestioneeventi;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.logging.Logger;
+
+import _gestioneeventi.EsecuzioneEnvironment.Stato;
+import _log.Log;
 
 /*
  * Serve ad aggiungere i singoli listener, ed ad attivarli e disattivali (tutti insieme)
@@ -16,6 +20,8 @@ import java.util.concurrent.*;
 
 public final class EsecuzioneEnvironment { // NB con final non si possono
 											// definire sottoclassi
+	
+	static Logger log = Log.creaLogger(EsecuzioneEnvironment.class.toString());
 	private EsecuzioneEnvironment() {
 	}
 
@@ -26,15 +32,26 @@ public final class EsecuzioneEnvironment { // NB con final non si possono
 	private static Stato statocorrente = Stato.Attesa;
 
 	private static ConcurrentHashMap<Listener, Thread> listenerAttivi = null;
-
-	//TODO: Verificare aggiunta listener in corsa
+	
 	public static synchronized void addListener(Listener lr) {
-		Environment.addListener(lr, new EsecuzioneEnvironment());
-		if (statocorrente == Stato.Esecuzione) {
-			listenerAttivi.put(lr, new Thread(new EsecuzioneListener(
-					lr)));
-			listenerAttivi.get(lr).start();
+		log.info("inserimento listener: " + lr);
+		if (statocorrente == Stato.Attesa) {
+			Environment.addListener(lr, new EsecuzioneEnvironment());
 		}
+		else {
+			Environment.addListener(lr, new EsecuzioneEnvironment());
+			attivaSingolo(lr);
+		}
+	}
+
+	public static void attivaSingolo(Listener listener) {
+		Thread t;
+		log.info("attivazione listener " + listener);
+		t = new Thread(new EsecuzioneListener(listener));
+		listenerAttivi.put(listener, t);
+		listenerAttivi.get(listener).start();
+		listenerAttivi.get(listener).setName("Thread di " + listener.toString());
+		log.info(listener + ": " + t);
 	}
 
 	public static synchronized void attivaListener() {
@@ -59,11 +76,10 @@ public final class EsecuzioneEnvironment { // NB con final non si possono
 	//TODO: Verificare disattiva listener in corsa
 	public static synchronized void disattivaListener(Listener l) {
 		Environment.aggiungiEvento(new Stop(null, l));
-		Thread thread = listenerAttivi.get(l);
 		try {
+			Thread thread = listenerAttivi.get(l);
 			thread.join();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

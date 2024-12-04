@@ -1,6 +1,5 @@
 package partita;
 
-import _framework.Executor;
 import _framework.Task;
 import _gestioneeventi.Environment;
 import _gestioneeventi.Evento;
@@ -19,9 +18,8 @@ class PartitaFired implements Task {
 	}
 
 	@Override
-	public synchronized void esegui(Executor exec) {
-		if (eseguita || exec == null
-				|| (e.getDestinatario() != p && e.getDestinatario() != null))
+	public synchronized void esegui() {
+		if (eseguita || (e.getDestinatario() != p && e.getDestinatario() != null))
 			return;
 		eseguita = true;
 		switch (p.getStato()) {

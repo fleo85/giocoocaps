@@ -1,6 +1,6 @@
 package attivita_composte;
 
-import _framework.Executor;
+import _framework.TaskExecutor;
 import partita.*;
 import attivita_atomiche.*;
 
@@ -19,7 +19,7 @@ public class AttivitaSottoramo1 implements Runnable {
 		eseguita = true;
 
 		Gioca g = new Gioca(partita);
-		Executor.perform(g);
+		TaskExecutor.getInstance().perform(g);
 	}
 
 	public synchronized boolean estEseguita() {
