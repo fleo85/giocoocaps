@@ -35,9 +35,9 @@ class PartitaFired implements Task {
 						.iterator();
 				while (it.hasNext()) {
 					Giocatore g = it.next().getGiocatore();
-					Environment.aggiungiEvento(new Inizio(null, g));
+					Environment.aggiungiEvento(new Inizio(p, g));
 				}
-				Environment.aggiungiEvento(new LancioDado(null, p
+				Environment.aggiungiEvento(new LancioDado(p, p
 						.getLinkComprendere().get(0).getGiocatore()));
 				p.statocorrente = Partita.Stato.INIZIATA;
 			}
