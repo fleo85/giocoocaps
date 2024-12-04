@@ -1,8 +1,11 @@
 package attivita_composte;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 import _gestioneeventi.Environment;
+import _gestioneeventi.EsecuzioneEnvironment;
+import _log.Log;
 import casella.Casella;
 import casellaSalto.CasellaSalto;
 import comprendere.TipoLinkComprendere;
@@ -13,7 +16,7 @@ import giocatore.Giocatore;
 import partita.Partita;
 
 public class AttivitaMovimento implements Runnable {
-	
+	static Logger log = Log.creaLogger(EsecuzioneEnvironment.class.toString());
 	private boolean eseguita = false;
 	private Giocatore g;
 	private int lancio;
@@ -35,7 +38,7 @@ public class AttivitaMovimento implements Runnable {
 			next = g.getLinkOccupare().getLinkSuccessore();
 
 			if (next == null) {
-				Environment.aggiungiEvento(new FinePartita(g, g.partitaCorrente, g));
+				Environment.aggiungiEvento(new FinePartita(g, g.getLinkComprendere().getPartita(), g));
 				fine = true;
 			} else {
 				g.inserisciLinkOccupare(next);
@@ -47,7 +50,7 @@ public class AttivitaMovimento implements Runnable {
 					break;
 				}
 				Environment.aggiungiEvento(new NuovaPosizione(g, null, next));
-				System.out.print(".." + next.getDisegno());
+				log.info(g.getNome() + " transita in " + next.getDisegno());
 			}
 		}
 		while (!fine && next.getClass() == CasellaSalto.class) {
@@ -62,13 +65,13 @@ public class AttivitaMovimento implements Runnable {
 			}
 			Environment.aggiungiEvento(new NuovaPosizione(g, null, next));
 			if (next.getLinkSuccessore() == null) {
-				Environment.aggiungiEvento(new FinePartita(g, g.partitaCorrente, g));
+				Environment.aggiungiEvento(new FinePartita(g, g.getLinkComprendere().getPartita(), g));
 				fine = true;
 			}
 		}
 
 		if (!fine) {
-			System.out.println("... si trova ora nella casella "
+			log.info(g.getNome() + " si trova ora nella casella "
 					+ next.getDisegno());
 			Partita p = g.getLinkComprendere().getPartita();
 			List<TipoLinkComprendere> links = p.getLinkComprendere();
@@ -78,7 +81,7 @@ public class AttivitaMovimento implements Runnable {
 					.getGiocatore();
 			Environment.aggiungiEvento(new LancioDado(g, prossimo));
 		} else
-			System.out.println("... ha vinto !!");
+			log.info(g.getNome() + " ha vinto !!");
 	}
 	
 	public synchronized boolean estEseguita() {

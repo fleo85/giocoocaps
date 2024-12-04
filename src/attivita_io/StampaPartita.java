@@ -7,7 +7,6 @@ import java.util.*;
 import comprendere.*;
 
 public class StampaPartita {
-
 	public static void perform(List<Casella> tabellone, Partita partita) {
 
 		System.out.println("== TABELLONE ==");

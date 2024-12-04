@@ -25,19 +25,8 @@ public class Gioca implements Task {
 		if (eseguita == true)
 			return;
 		eseguita = true;
-
-		Iterator<TipoLinkComprendere> it = partita.getLinkComprendere()
-				.iterator();
-		while (it.hasNext()) {
-			Giocatore g = it.next().getGiocatore();
-			EsecuzioneEnvironment.addListener(g);
-			Environment.aggiungiEvento(new Inizio(null, g, this.partita));
-		}
-		EsecuzioneEnvironment.addListener(partita);
-
-		Environment.aggiungiEvento(new LancioDado(null, partita
-				.getLinkComprendere().get(0).getGiocatore()));
-		EsecuzioneEnvironment.attivaListener();
+		
+		Environment.aggiungiEvento(new Inizio(null, this.partita));
 	}
 
 	public synchronized boolean estEseguita() {

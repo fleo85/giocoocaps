@@ -6,10 +6,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
+import java.util.logging.Logger;
 
 import _framework.TaskExecutor;
 import _gestioneeventi.Environment;
 import _gestioneeventi.EsecuzioneEnvironment;
+import _log.Log;
 import attivita_atomiche.CreaPartita;
 import attivita_composte.AttivitaPrincipale;
 import casella.Casella;
@@ -20,7 +22,7 @@ import giocatore.Giocatore;
 import partita.Partita;
 
 public class ClientThread implements Runnable {
-
+	static Logger log = Log.creaLogger(EsecuzioneEnvironment.class.toString());
 	private Socket sock;
 	private boolean fired = false;
 	private SenderThread st = null;
@@ -95,7 +97,7 @@ public class ClientThread implements Runnable {
 		try {
 			while (running) {
 				String cmd = in.readLine();
-				System.out.println("Ricevuto: " + cmd);
+				log.info("Ricevuto: " + cmd);
 				if (cmd.startsWith("START")) {
 					HashSet<Giocatore> giocatori = new HashSet<Giocatore>();
 					String users = cmd.substring(cmd.indexOf(" ")).trim();
@@ -110,11 +112,13 @@ public class ClientThread implements Runnable {
 							Giocatore g = new Giocatore(s.trim());
 							giocatori.add(g);
 							giocatoriConnessione.add(g);
+							EsecuzioneEnvironment.addListener(g);
 						}
 					}
 					CreaPartita cp = new CreaPartita(tabellone, giocatori);
 					TaskExecutor.getInstance().perform(cp);
 					partita = cp.getResult();
+					EsecuzioneEnvironment.addListener(partita);
 					st = new SenderThread(pw, tabellone);
 					Thread t = new Thread(st);
 					t.start();
@@ -171,7 +175,7 @@ public class ClientThread implements Runnable {
 				EsecuzioneEnvironment.disattivaListener(g);
 			}
 			Environment.removeRemoteEventLogger(null, partita, FinePartita.class, pw);
-			System.out.println("RIMUOVO TUTTI I GIOCATORI");
+			log.info("RIMUOVO TUTTI I GIOCATORI");
 		}
 	}
 

@@ -1,15 +1,18 @@
 package attivita_composte;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 import casella.*;
 import partita.*;
 import attivita_atomiche.*;
 import attivita_io.*;
 import _framework.*;
+import _gestioneeventi.EsecuzioneEnvironment;
+import _log.Log;
 
 public class AttivitaPrincipale implements Runnable {
-
+	static Logger log = Log.creaLogger(EsecuzioneEnvironment.class.toString());
 	private boolean eseguita = false;
 	private Partita partita;
 	private List<Casella> tabellone;
@@ -48,7 +51,7 @@ public class AttivitaPrincipale implements Runnable {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			System.out.println("PARTITA FINITA IN QUALCHE MANIERA");
+			log.info("PARTITA FINITA IN QUALCHE MANIERA");
 		}
 
 	}

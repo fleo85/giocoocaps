@@ -4,11 +4,8 @@ import _gestioneeventi.*;
 import partita.Partita;
 
 public class Inizio extends Evento {
-	private Partita p;
-	
-	public Inizio(Listener m, Listener d, Partita p) {
+	public Inizio(Listener m, Listener d) {
 		super(m, d);
-		this.p = p;
 	}
 
 	public boolean equals(Object o) {
@@ -21,9 +18,5 @@ public class Inizio extends Evento {
 
 	public String toString() {
 		return "Inizio(" + getMittente() + " -> " + getDestinatario() + ")";
-	}
-	
-	public Partita getPartita() {
-		return this.p;
 	}
 }

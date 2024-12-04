@@ -76,7 +76,6 @@ public class Giocatore implements Listener {
 	}
 
 	Stato statocorrente = Stato.ALLENAMENTO;
-	public Partita partitaCorrente = null;
 	Thread attivitaMovimento = null;
 
 	public Stato getStato() {

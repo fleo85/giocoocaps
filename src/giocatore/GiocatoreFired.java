@@ -1,17 +1,21 @@
 package giocatore;
 
 import java.util.*;
+import java.util.logging.Logger;
+
 import comprendere.*;
 import partita.*;
 import casella.*;
 import casellaSalto.*;
 import _framework.*;
 import _gestioneeventi.*;
+import _log.Log;
 import attivita_composte.AttivitaMovimento;
 import eventi.*;
 import giocatore.Giocatore.Stato;
 
 class GiocatoreFired implements Task {
+	static Logger log = Log.creaLogger(EsecuzioneEnvironment.class.toString());
 	private boolean eseguita = false;
 	private Giocatore g;
 	private Evento e;
@@ -36,15 +40,16 @@ class GiocatoreFired implements Task {
 		case ALLENAMENTO:
 			if (e.getClass() == Inizio.class) {
 				Inizio i = (Inizio) e;
-				g.partitaCorrente = i.getPartita();
-				g.statocorrente = Stato.INPARTITA;
+				if (g.getLinkComprendere() != null) {
+					g.statocorrente = Stato.INPARTITA;
+				}
 			}
 			break;
 		case INPARTITA:
 			if (e.getClass() == LancioDado.class) {
 				int lancio = this.randomNumber();
 
-				System.out.print(g.getNome() + " ha lanciato " + lancio
+				log.info(g.getNome() + " ha lanciato " + lancio
 						+ " e si sta muovendo ...");
 
 				g.attivitaMovimento = new Thread(new AttivitaMovimento(g, lancio));

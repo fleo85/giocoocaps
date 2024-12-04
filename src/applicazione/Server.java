@@ -5,12 +5,16 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
-public class Server implements Runnable {
+import _gestioneeventi.EsecuzioneEnvironment;
+import _log.Log;
 
+public class Server implements Runnable {
+	static Logger log = Log.creaLogger(EsecuzioneEnvironment.class.toString());
 	private ServerSocket lis = null;
 	private String port;
 	private List<ClientThread> ctList;
@@ -28,7 +32,7 @@ public class Server implements Runnable {
 	}
 
 	public void run() {
-
+		EsecuzioneEnvironment.attivaListener();
 		try {
 			lis = new ServerSocket(Integer.parseInt(port));
 		} catch (IOException e1) {
@@ -37,7 +41,7 @@ public class Server implements Runnable {
 					0);
 			System.exit(1);
 		}
-		System.out.println("Server Avviato");
+		log.info("Server Avviato");
 		Socket sock = null;
 
 		while (true) {
@@ -46,13 +50,14 @@ public class Server implements Runnable {
 			} catch (IOException e) {
 				break;
 			}
-			System.out.println("Socket creata, connessione accettata");
+			log.info("Socket creata, connessione accettata");
 			ClientThread cl = new ClientThread(sock, this);
 			Thread tr = new Thread(cl);
 			tr.start();
 			ctList.add(cl);
 			clientsLabel.setText(""+ctList.size());
 		}
+		EsecuzioneEnvironment.disattivaListener();
 	}
 	
 	public void stop() throws IOException{

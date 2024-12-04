@@ -3,10 +3,13 @@ package _gestioneeventi;
 import java.io.PrintWriter;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.logging.Logger;
 
+import _log.Log;
 import eventi.FinePartita;
 
 public final class Environment { // NB con final non si possono definire
+	static Logger log = Log.creaLogger(EsecuzioneEnvironment.class.toString());
 	// sottoclassi
 	private Environment() { // NB non si possono costruire oggetti Environment
 	} 
@@ -97,7 +100,7 @@ public final class Environment { // NB con final non si possono definire
 						pw.println(toSend);
 						pw.flush();
 					} else {
-						System.out.println("WARNING: MESSAGGIO NULL NON INVIATO");
+						log.warning("WARNING: MESSAGGIO NULL NON INVIATO");
 					}
 				}
 			}

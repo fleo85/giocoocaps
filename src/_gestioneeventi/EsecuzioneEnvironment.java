@@ -57,7 +57,7 @@ public final class EsecuzioneEnvironment { // NB con final non si possono
 	public static synchronized void attivaListener() {
 		if (statocorrente == Stato.Attesa) {
 			statocorrente = Stato.Esecuzione;
-			System.out.println("Ora attiviamo i listener");
+			log.info("Ora attiviamo i listener");
 			listenerAttivi = new ConcurrentHashMap<Listener, Thread>();
 			Iterator<Listener> it = Environment.getInsiemeListener().iterator();
 			while (it.hasNext()) {
@@ -87,7 +87,7 @@ public final class EsecuzioneEnvironment { // NB con final non si possono
 	public static synchronized void disattivaListener() {
 		if (statocorrente == Stato.Esecuzione) {
 			statocorrente = Stato.Attesa;
-			System.out.println("Ora fermiano i listener");
+			log.info("Ora fermiano i listener");
 			Environment.aggiungiEvento(new Stop(null, null));
 			// NB: a questo punto i listener non sono ancora fermi
 			// ma l'evento Stop e' stato inserito nella coda di ciascuno di loro

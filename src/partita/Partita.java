@@ -54,10 +54,10 @@ public class Partita implements Listener {
 	}
 	
 	public static enum Stato {
-		INIZIATA, FINITA
+		STANDBY, INIZIATA, FINITA
 	}
 
-	Stato statocorrente = Stato.INIZIATA;
+	Stato statocorrente = Stato.STANDBY;
 
 	public Stato getStato() {
 		return statocorrente;

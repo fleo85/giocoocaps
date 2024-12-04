@@ -1,6 +1,7 @@
 package comprendere;
 
 import giocatore.*;
+import partita.Partita;
 
 public final class ManagerComprendere {
 	private ManagerComprendere(TipoLinkComprendere x) {
@@ -18,6 +19,9 @@ public final class ManagerComprendere {
 			if (y.getGiocatore().getStato() != Giocatore.Stato.ALLENAMENTO)
 				throw new RuntimeException(
 						"Non si puo' modificare un giocatore mentre sta giocando");
+			if (y.getPartita().getStato() != Partita.Stato.STANDBY)
+				throw new RuntimeException(
+						"Non si puo' modificare una partita dopo l'inizio");
 			ManagerComprendere k = new ManagerComprendere(y);
 			y.getGiocatore().inserisciPerManagerComprendere(k);
 			y.getPartita().inserisciPerManagerComprendere(k);
@@ -29,6 +33,9 @@ public final class ManagerComprendere {
 			if (y.getGiocatore().getStato() != Giocatore.Stato.ALLENAMENTO)
 				throw new RuntimeException(
 						"Non si puo' modificare un giocatore mentre sta giocando");
+			if (y.getPartita().getStato() != Partita.Stato.STANDBY)
+				throw new RuntimeException(
+						"Non si puo' modificare una partita dopo l'inizio");
 			ManagerComprendere k = new ManagerComprendere(y);
 			y.getGiocatore().eliminaPerManagerComprendere(k);
 			y.getPartita().eliminaPerManagerComprendere(k);
