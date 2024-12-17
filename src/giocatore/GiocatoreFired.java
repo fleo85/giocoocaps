@@ -40,6 +40,9 @@ class GiocatoreFired implements Task {
 		case ALLENAMENTO:
 			if (e.getClass() == Inizio.class) {
 				Inizio i = (Inizio) e;
+				if (i.getMittente() != g.getLinkComprendere().getPartita()) {
+					throw new RuntimeException("La partita mittente deve essere uguale alla partita collegata");
+				}
 				if (g.getLinkComprendere() != null) {
 					g.statocorrente = Stato.INPARTITA;
 				}
